@@ -4,35 +4,15 @@ import sys
 def main():
     contacts = {}
 
-    #Server Port
-    serverPort = 13000
-
-    #Create socket using IPv4 and TCP protocols
-    try:
-        serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    except socket.error as e:
-        print("Error Creating Socket: ", e)
-        sys.exit(1)
-
-    #Bind Server Socket to chosen port
-    try:
-        serverSocket.bind(('', serverPort))
-    except socket.error as e:
-        print("Error Binding Socket: ", e)
-        sys.exit(1)
-
-    print("Server Ready For Connections")
-
-    serverSocket.listen(1)
+    serverSocket = connect()
 
     while True:
         try:
             connectionSocket, addr = serverSocket.accept()
-            print(addr, " Has Connected to Socket: ", connectionSocket)
-            x  = 0
+            #print(addr, " Has Connected to Socket: ", connectionSocket)
 
-            while (x != 1):
-                #print("Awaiting Message...")
+            while 1:
+                #Receive Message and decode
                 message = connectionSocket.recv(2048).decode('ascii')
 
                 #print("Message Received: ", message)
@@ -59,11 +39,46 @@ def main():
                 sent_size = connectionSocket.send(message.encode('ascii'))
                 print(sent_size)
 
+            connectionSocket.close()
+
         except socket.error as e:
             print('An error occured:',e)
             connectionSocket.close()
             serverSocket.close()
             sys.exit(1)
+
+
+
+def connect():
+
+    #Server Port
+    serverPort = 13000
+
+    #Create socket using IPv4 and TCP protocols
+    try:
+        serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    except socket.error as e:
+        print("Error Creating Socket: ", e)
+        sys.exit(1)
+
+    #Bind Server Socket to chosen port
+    try:
+        serverSocket.bind(('', serverPort))
+    except socket.error as e:
+        print("Error Binding Socket: ", e)
+        sys.exit(1)
+
+    #Set connection queue to max 1
+    serverSocket.listen(1)
+
+    #return serverSocket object
+    return serverSocket
+
+
+
+
+
+
 
 def add_contact(contacts, name, num):
 
@@ -92,6 +107,8 @@ def search(contacts, value):
     print(results)
 
     return results
+
+
 
 
 

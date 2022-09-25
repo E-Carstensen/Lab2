@@ -4,11 +4,81 @@ import sys
 
 def main():
 
+    clientSocket = connect()
+    try:
+        while (1):
+            #Call menu funtion to get user choice and format message
+            option = menu()
+            clientSocket.send(option)
+
+            if (option == '1'):
+                add_contact(clientSocket)
+            elif(option == '2'):
+                search(clientSocket)
+            elif(option == '3'):
+                disconnect(clientSocket)
+                break
+
+
+        #print("Sending Data...")
+        #sent_size =  clientSocket.send(message.encode('ascii'))
+        #print(sent_size, "Bytes sent")
+
+        #print("Awaiting Response... ")
+        #response = clientSocket.recv(2048).decode('ascii')
+
+        #print(response)
+
+        #if message.split('~')[0] == '2':
+        #    format(response)
+
+    except:
+        socket.error as e:
+        print("Error:", e)
+        clientSocket.close()
+        sys.exit(1)
+
+    
+    print("Error:", e)
+    clientSocket.close()
+    sys.exit(1)
+
+
+
+#Displays main menu options, takes input and returns string if input is valid
+def menu():
+
+    #Print menu options and take user input
+    option = input("""Please select the operation
+1)Add a new entry
+2)Search
+3)Terminate the connection
+        """)
+
+    #If input is one of options and only 1 character
+    if(option in "123" and len(option) == 1):
+        return option
+    else:
+        #If code makes it this far without returning, the input is invalid
+        print("Input Not Recognized")
+        #Recursively call menu function
+        return menu()
+
+
+
+
+#Take server information from user, initiate socket, and connect to server
+#Returns clientSocket object
+def connect():
+    #Default server information
     serverName = '127.0.0.1'
     serverPort = 13000
 
     #Take server name from user
-    serverName = input("Enter the server name or IP address: ")
+    temp = input("Enter the server name or IP address: ")
+    if (len(temp) != 0):
+        #If user does not enter an address, use default serverName
+        serverName = temp
 
     #Attempt to create client socket with IPv4 and TCP protocols
     try:
@@ -21,73 +91,50 @@ def main():
     try:
         clientSocket.connect((serverName, serverPort))
         print("Welcome to the online phone book. \n")
-
-        while (1):
-            #Call menu funtion to get user choice and format message
-            message = menu()
-
-            #If user chose Disconnect, send server Disconnect message
-            if message == False:
-                clientSocket.send('3'.encode('ascii'))
-                clientSocket.close()
-                print("Goodbye")
-                return
-
-            #print("Sending Data...")
-            sent_size =  clientSocket.send(message.encode('ascii'))
-            #print(sent_size, "Bytes sent")
-
-            #print("Awaiting Response... ")
-            response = clientSocket.recv(2048).decode('ascii')
-
-            print(response)
-
-            if message.split('~')[0] == '2':
-                format(response)
-
-
-
-
-
     except socket.error as e:
         print("Error:", e)
         clientSocket.close()
         sys.exit(1)
 
-# Returns a string with the opeation requested and the required values
-# joined by a '~' character to diferentiate them
-def menu():
+    return clientSocket
 
-    #Print menu options and take user input
-    option = input("""Please select the operation
-1)Add a new entry
-2)Search
-3)Terminate the connection
-        """)
 
-    #Add Contact
-    if (option == '1'):
-        #Take name and number for new contact
-        name = input("Enter the Name: ")
-        num = input("Enter the Phone Number: ")
-        #Return 'operation~name~number'
-        return '~'.join([option, name, num])
-    #Search
-    if (option == '2'):
-        #Take seach term, can be name or number
-        value = input("Enter Search term: ")
 
-        return '~'.join([option, value])
+def search():
 
-    #Disconnect
-    if(option == '3'):
+    message = clientSocket.recv(2048).decode('ascii')
 
-        return False
+    val = input(message + ": ")
 
-    #If code makes it this far without returning, the input is invalid
-    print("Input Not Recognized")
-    #So recursively call menu function
-    return menu()
+    clientSocket.send(val.encode('ascii'))
+
+    result = clientSocket.recv(2048).decode('ascii')
+
+    format(result)
+
+
+def add_contact(clientSocket):
+
+    message = clientSocket.recv(2048).decode('ascii')
+
+    name = input(message + ": ")
+
+    clientSocket.send(name.encode('ascii'))
+
+    message = clientSocket.recv(2048).decode('ascii')
+
+    num = input(message + ": ")
+
+    clientSocket.send(num.encode('ascii'))
+
+
+
+def disconnect():
+    clientSocket.send('3'.encode('ascii'))
+    clientSocket.close()
+    print("Goodbye")
+    return
+
 
 #Format search results to be displayed
 def format(temp):
@@ -100,7 +147,7 @@ def format(temp):
     #For each contact returned, print all numbers assosiated with it
     for val in results:
         x = val.split('~')
-        print(f"{x[0]}         {x[1:]}")
+        print(f"{x[0]:16}{x[1:]}")
 
 
 print("diferentiate")
