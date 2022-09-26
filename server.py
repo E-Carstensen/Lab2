@@ -25,13 +25,15 @@ def main():
                     else:
                         connectionSocket.send("Invalid Input".encode('ascii'))
 
-                connectionSocket.close()
 
             except socket.error as e:
                 print('An error occured:',e)
                 connectionSocket.close()
                 serverSocket.close()
                 sys.exit(1)
+
+            connectionSocket.close()
+
 
     except KeyboardInterrupt:
             #connectionSocket.close()
