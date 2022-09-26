@@ -12,32 +12,18 @@ def main():
             #print(addr, " Has Connected to Socket: ", connectionSocket)
 
             while 1:
-                #Receive Message and decode
-                message = connectionSocket.recv(2048).decode('ascii')
 
-                #print("Message Received: ", message)
-                values = message.split('~')
+                operation = connectionSocket.recv(2048).decode('ascii')
 
-
-                if (values[0] == '1'):
-                    contacts = add_contact(contacts, values[1], values[2])
-                    message = ' '.join(contacts[values[1]])
-
-                elif (values[0] == '2'):
-                    result = search(contacts, values[1])
-                    message = '|'.join(result)
-
-                elif (values[0] == '3'):
-                    print("Goodbye.\n")
+                if (operation == '1'):
+                    add_contact(connectionSocket, contacts)
+                elif (operation == '2'):
+                    search(connectionSocket, contacts)
+                elif (operation == '3'):
                     connectionSocket.close()
-
                     break
                 else:
-                    print("\n**Operation Not Recognized\n")
-
-                print("Sending Data...")
-                sent_size = connectionSocket.send(message.encode('ascii'))
-                print(sent_size)
+                    connectionSocket.send("Invalid Input".encode('ascii'))
 
             connectionSocket.close()
 
@@ -52,7 +38,7 @@ def main():
 def connect():
 
     #Server Port
-    serverPort = 13000
+    serverPort = 13004
 
     #Create socket using IPv4 and TCP protocols
     try:
@@ -80,7 +66,13 @@ def connect():
 
 
 
-def add_contact(contacts, name, num):
+def add_contact(connectionSocket, contacts):
+
+    connectionSocket.send("Enter Name: ".encode('ascii'))
+    name = connectionSocket.recv(2048).decode('ascii')
+
+    connectionSocket.send("Enter Number: ".encode('ascii'))
+    num = connectionSocket.recv(2048).decode('ascii')
 
     if (name in contacts):
         contacts[name].append(num)
@@ -90,23 +82,29 @@ def add_contact(contacts, name, num):
     return contacts
 
 
-def search(contacts, value):
-    results = []
+def search(connectionSocket, contacts):
+    result = ''
+
+    connectionSocket.send("Enter the Search Word: ".encode('ascii'))
+    value = connectionSocket.recv(2048).decode('ascii')
+
+
     for key, nums in contacts.items():
         if (value in key):
-            numbers = '~'.join(contacts[key])
-            results.append('~'.join([key,numbers]))
+            result += (f"{key:<16}{nums!s}")
+            #result += key + ' '*8-len(key) + str(contacts[key]) + '\n'
             continue
 
         for num in nums:
             if value in num:
-                numbers = '~'.join(contacts[key])
-                results.append('~'.join([key,numbers]))
-                break
+                #result += key + ' ' * (8-len(key)) + str(contacts[key]) + '\n'
+                result += (f"{key:<16}{nums!s}\n")
 
-    print(results)
+                continue
 
-    return results
+    #print(result)
+    connectionSocket.send(result.encode('ascii'))
+    return result
 
 
 

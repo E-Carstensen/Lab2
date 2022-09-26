@@ -9,7 +9,7 @@ def main():
         while (1):
             #Call menu funtion to get user choice and format message
             option = menu()
-            clientSocket.send(option)
+            clientSocket.send(option.encode('ascii'))
 
             if (option == '1'):
                 add_contact(clientSocket)
@@ -19,27 +19,13 @@ def main():
                 disconnect(clientSocket)
                 break
 
-
-        #print("Sending Data...")
-        #sent_size =  clientSocket.send(message.encode('ascii'))
-        #print(sent_size, "Bytes sent")
-
-        #print("Awaiting Response... ")
-        #response = clientSocket.recv(2048).decode('ascii')
-
-        #print(response)
-
-        #if message.split('~')[0] == '2':
-        #    format(response)
-
-    except:
-        socket.error as e:
+    except socket.error as e:
         print("Error:", e)
         clientSocket.close()
         sys.exit(1)
 
-    
-    print("Error:", e)
+
+    print("Goodbye")
     clientSocket.close()
     sys.exit(1)
 
@@ -72,7 +58,7 @@ def menu():
 def connect():
     #Default server information
     serverName = '127.0.0.1'
-    serverPort = 13000
+    serverPort = 13004
 
     #Take server name from user
     temp = input("Enter the server name or IP address: ")
@@ -100,7 +86,7 @@ def connect():
 
 
 
-def search():
+def search(clientSocket):
 
     message = clientSocket.recv(2048).decode('ascii')
 
@@ -117,19 +103,19 @@ def add_contact(clientSocket):
 
     message = clientSocket.recv(2048).decode('ascii')
 
-    name = input(message + ": ")
+    name = input(message)
 
     clientSocket.send(name.encode('ascii'))
 
     message = clientSocket.recv(2048).decode('ascii')
 
-    num = input(message + ": ")
+    num = input(message)
 
     clientSocket.send(num.encode('ascii'))
 
 
 
-def disconnect():
+def disconnect(clientSocket):
     clientSocket.send('3'.encode('ascii'))
     clientSocket.close()
     print("Goodbye")
@@ -149,6 +135,4 @@ def format(temp):
         x = val.split('~')
         print(f"{x[0]:16}{x[1:]}")
 
-
-print("diferentiate")
 main()
