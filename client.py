@@ -61,7 +61,7 @@ Choice: """)
 def connect():
     #Default server information
     serverName = '127.0.0.1'
-    serverPort = 13005
+    serverPort = 13000
 
     #Take server name from user
     temp = input("Enter the server name or IP address: ")

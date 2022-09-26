@@ -43,7 +43,7 @@ def main():
 def connect():
 
     #Server Port
-    serverPort = 13005
+    serverPort = 13000
 
     #Create socket using IPv4 and TCP protocols
     try:
