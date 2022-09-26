@@ -1,3 +1,9 @@
+"""
+Eric Carstensen - 3070801
+CMPT 361 - AS01
+Lab 2
+"""
+
 import socket
 import sys
 
