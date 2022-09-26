@@ -92,7 +92,7 @@ def add_contact(connectionSocket, contacts):
 #Returns and sends formatted search result string
 def search(connectionSocket, contacts):
     #Define header text
-    result = "\n\nName:\tPhoneNumber(s):\n"
+    result = "\n\nName:\t     PhoneNumber(s):\n"
 
     #send client prompt message
     connectionSocket.send("Enter the Search Word: ".encode('ascii'))
