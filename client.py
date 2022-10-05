@@ -1,7 +1,7 @@
 """
 Eric Carstensen - 3070801
 CMPT 361 - AS01
-Lab 2
+Assignment 1
 """
 
 import socket
